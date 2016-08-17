@@ -73,7 +73,7 @@
                 dataOptions = $this.data(key) || {};
 
             /* data-* options should be strictly an object */
-            assert(typeof dataOptions === 'object', 'data-' + key + ': ' + dataOptions + ' is the a wrong format');
+            assert(typeof dataOptions === 'object', 'data-' + key + ': ' + dataOptions + ' is in the wrong format');
 
             options = $.extend(true, {}, settings.options, dataOptions);
 
