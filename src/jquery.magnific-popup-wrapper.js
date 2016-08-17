@@ -46,12 +46,7 @@
     initializeEvents();
     initializePopups();
     registerGlobalEvents();
-
-    window.mfpWrapper = $.extend(true, {}, settings, {
-        events: events,
-        getPopupInstance: _getPopupInstance,
-        nsp: nsp
-    });
+    registerGlobalObject();
 
     /* Initialize settings */
     function initializeSettings() {
@@ -134,6 +129,14 @@
         });
     }
 
+    /* Register useful objects, functions on the global namespace */
+    function registerGlobalObject() {
+        window.mfpWrapper = $.extend(true, {}, settings, {
+            events: events,
+            getPopupInstance: _getPopupInstance,
+            nsp: nsp
+        });
+    }
 
     /* Get the namespaced event name */
     function nsp(eventname) {
@@ -150,11 +153,6 @@
         if (!expression) {
             throw new Error(message);
         }
-    }
-
-    /* Trigger event (from iframe) when ready event occurs */
-    function iframeReady() {
-        $(window).trigger(events.iframeReady);
     }
 
     /* Adjust iframe height to the height of the iframe's html */
@@ -199,11 +197,6 @@
     /* The iframe's document object */
     function _getIframeDocument() {
         return _getIframeDOM().contentDocument;
-    }
-
-    /* The iframe's window object */
-    function _getIframeWindow() {
-        return _getIframeDOM().contentWindow || _getIframeDocument().parentWindow;
     }
 
 })(jQuery);

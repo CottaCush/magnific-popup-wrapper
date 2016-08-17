@@ -13,24 +13,29 @@
         events = mfpWrapper.events,
         getPopupInstance = mfpWrapper.getPopupInstance;
 
-    /* Close Iframe buttons */
-    $(mfpWrapper.closeSelector).on(nsp('click'), closeIframe);
 
-
+    _registerEventListeners();
     _initializeResize();
-
-
-    window.mfpIframeWrapper = {
-        closeIframe: closeIframe,
-        closeIframeAndReload: closeIframeAndReload,
-        iframeResize: iframeResize,
-        topWindowEvent: topWindowEvent
-    };
-
-
+    registerGlobalObject();
     /* Alert top page that iframe is loaded */
     topWindowEvent(events.iframeReady);
 
+
+    /* Create general event listeners on the page */
+    function _registerEventListeners() {
+        /* Close Iframe buttons */
+        $(mfpWrapper.closeSelector).on(nsp('click'), closeIframe);
+    }
+
+    /* Register useful objects, functions to the global namespace */
+    function registerGlobalObject() {
+        window.mfpIframeWrapper = {
+            closeIframe: closeIframe,
+            closeIframeAndReload: closeIframeAndReload,
+            iframeResize: iframeResize,
+            topWindowEvent: topWindowEvent
+        };
+    }
 
     /* Send iframeResize events to the top window if the frame contains the necessary data-* attributes */
     function _initializeResize() {
@@ -42,7 +47,7 @@
             iframeResize();
         }
         if (autoResize) {
-            $(window, document,'html').on(nsp('resize'), function () {
+            $(window, document, 'html').on(nsp('resize'), function () {
                 iframeResize();
             });
         }
@@ -52,7 +57,6 @@
     function iframeResize() {
         var height = $('html').height();
         topWindowEvent(events.iframeResize, {height: height});
-
     }
 
     /* Trigger events and optional data on the top window */
