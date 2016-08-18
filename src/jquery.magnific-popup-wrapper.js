@@ -83,6 +83,7 @@
             /* Stop propagation on child elements */
             var $child = $this.find(settings.stopPropagationSelector);
             $child.on(nsp('click'), function (event) {
+                event.preventDefault();
                 event.stopPropagation();
             });
 
