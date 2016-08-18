@@ -55,7 +55,7 @@ Please note that the above won't work in iframes without custom work.
 
 
 ### 2. Using jQuery
-Using the wrapper with jQuery is as easy as: `$(element).mfpWrapper(options)` where `options` is a standard object passed into Magnific Popup. 
+Using the wrapper with jQuery is as simple as `$(element).mfpWrapper(options)` where `options` is an optional object passed into Magnific Popup. 
 
 
 
