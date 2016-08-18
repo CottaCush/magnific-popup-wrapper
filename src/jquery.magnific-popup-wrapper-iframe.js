@@ -4,76 +4,20 @@
 
 (function ($, topWindow, top$) {
     /* return if these objects doesn't exist */
-    if (!topWindow || !top$ || !topWindow.mfpWrapper) {
+    if (!topWindow || !top$ || !top$.magnificPopup) {
         return;
     }
 
-    var mfpWrapper = topWindow.mfpWrapper,
-        nsp = mfpWrapper.nsp,
-        events = mfpWrapper.events,
-        getPopupInstance = mfpWrapper.getPopupInstance;
-
-
-    _registerEventListeners();
-    _initializeResize();
-    registerGlobalObject();
-    /* Alert top page that iframe is loaded */
-    topWindowEvent(events.iframeReady);
-
-
-    /* Create general event listeners on the page */
-    function _registerEventListeners() {
-        /* Close Iframe buttons */
-        $(mfpWrapper.closeSelector).on(nsp('click'), closeIframe);
-    }
-
-    /* Register useful objects, functions to the global namespace */
-    function registerGlobalObject() {
-        window.mfpIframeWrapper = {
-            closeIframe: closeIframe,
-            closeIframeAndReload: closeIframeAndReload,
-            iframeResize: iframeResize,
-            topWindowEvent: topWindowEvent
-        };
-    }
-
-    /* Send iframeResize events to the top window if the frame contains the necessary data-* attributes */
-    function _initializeResize() {
-        var $frame = $(window.frameElement),
-            resize = $frame.data(mfpWrapper.iframeResizeKey),
-            autoResize = $frame.data(mfpWrapper.iframeAutoResizeKey);
-
-        if (resize || autoResize) {
-            iframeResize();
-        }
-        if (autoResize) {
-            $(window, document, 'html').on(nsp('resize'), function () {
-                iframeResize();
-            });
-        }
-    }
-
-    /* Trigger an iframeResize event on the top window */
-    function iframeResize() {
-        var height = $('html').height();
-        topWindowEvent(events.iframeResize, {height: height});
-    }
-
-    /* Trigger events and optional data on the top window */
-    function topWindowEvent(type, data) {
-        top$(topWindow).trigger(type, data);
-    }
-
     /* close the iframe and reload the top page */
-    function closeIframeAndReload() {
+    window.closeIframeAndReload = function () {
         closeIframe();
         topWindow.location.reload();
-    }
+    };
 
     /* close the iframe */
-    function closeIframe() {
-        getPopupInstance().close();
-    }
+    window.closeIframe = function () {
+        top$.magnificPopup.instance.close();
+    };
 
 })(jQuery, window.top, window.top.jQuery);
 

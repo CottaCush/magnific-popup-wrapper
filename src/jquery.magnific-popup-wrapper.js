@@ -1,6 +1,5 @@
 ;(function ($) {
-    var events = {},
-        settings = {},
+    var settings,
         defaults = {
             /* The selector used to find all valid popup links */
             selector: '[data-mfp]',
@@ -14,190 +13,78 @@
             /* Selector for close links and buttons */
             closeSelector: '[data-mfp-close]',
 
-            /* data-* attribute on the link to resize the iframe once it is loaded */
-            iframeResizeKey: 'mfp-resize',
-
-            /* data-* attribute on the link to enable the iframe's height auto resize */
-            iframeAutoResizeKey: 'mfp-auto-resize',
-
-            event: {
-                namespace: '.magnific-popup-wrapper',
-
-                names: {
-                    /* Called when iframe document onready event fires */
-                    iframeReady: 'iframeReady',
-
-                    /* Called before resizing the iframe */
-                    iframeResize: 'iframeResize',
-
-                    /* Called when the popup is opened */
-                    open: 'open',
-
-                    /* Called when the popup is closed */
-                    close: 'close'
-                }
-            },
+            /* Namespace used for events */
+            eventNamespace: '.magnific-popup-wrapper',
 
             /* data to be passed into Magnific Popup */
             options: {}
         };
 
-    initializeSettings();
-    initializeEvents();
-    initializePopups();
-    registerGlobalEvents();
-    registerGlobalObject();
+
+    /* Define the jQuery plugin */
+    $.fn.mfpWrapper = function (options) {
+        return this.each(function () {
+            Wrapper(this, options);
+        });
+    };
 
     /* Initialize settings */
-    function initializeSettings() {
-        var jsDefaults = (typeof window.mfpWrapperDefaults !== 'undefined') ? window.mfpWrapperDefaults : {};
-        assert(typeof jsDefaults === 'object', 'window.mfpWrapperDefaults is not an object');
-        settings = $.extend(true, {}, defaults, jsDefaults);
-    }
-
-    /* Define all the (namespaced) events */
-    function initializeEvents() {
-        var names = settings.event.names;
-        for (var key in names) {
-            if (names.hasOwnProperty(key))
-                events[key] = nsp(names[key]);
-        }
-    }
+    $.mfpWrapperDefaults = $.mfpWrapperDefaults || {};
+    assert(typeof $.mfpWrapperDefaults === 'object', '$.mfpWrapperDefaults is not a valid object');
+    settings = $.extend(true, {}, defaults, $.mfpWrapperDefaults);
 
     /* Activate the popups */
-    function initializePopups() {
-        var key = settings.dataOptionsKey;
-        $(settings.selector).each(function () {
-            var $this = $(this),
-                options,
-                dataOptions = $this.data(key) || {};
+    $(settings.selector).mfpWrapper();
 
-            /* data-* options should be strictly an object */
-            assert(typeof dataOptions === 'object', 'data-' + key + ': ' + dataOptions + ' is in the wrong format');
-
-            options = $.extend(true, {}, settings.options, dataOptions);
-
-            /* Call the $.fn.magnificPopup function */
-            $this.magnificPopup(options);
-
-            /* Stop propagation on child elements */
-            var $child = $this.find(settings.stopPropagationSelector);
-            $child.on(nsp('click'), function (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            });
-
-            /* Add event listeners */
-            $this.on('mfpOpen', function () {
-                $this.trigger(events.open);
-
-                /* Add data- attributes on the iframe to be picked up from the iframe script */
-                if (_getPopupInstanceSt().type === 'iframe') {
-                    var resizeKey = settings.iframeResizeKey,
-                        autoResizeKey = settings.iframeAutoResizeKey;
-
-                    if ($this.data(resizeKey)) {
-                        _getIframe().attr('data-' + resizeKey, 'true');
-                    }
-                    if ($this.data(autoResizeKey)) {
-                        _getIframe().attr('data-' + autoResizeKey, 'true');
-                    }
-                }
-
-            }).on('mfpClose', function () {
-                $this.trigger(events.close);
-            });
-
-        });
+    /* Close buttons & links */
+    $(document).on(nsp('click'), settings.closeSelector, function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        $.magnificPopup.instance.close();
+    });
 
 
-    }
+    /* The Wrapper Class */
+    function Wrapper(element, options) {
+        var $ele = $(element),
+            dataOptions = $ele.data(settings.dataOptionsKey) || {};
 
-    /* Register global events*/
-    function registerGlobalEvents() {
-        var $w = $(window),
-            $d = $(document);
+        options = options || {};
 
-        /* Close buttons & links */
-        $d.on(nsp('click'), settings.closeSelector, function (event) {
+        /* options should be strictly an object */
+        assert(typeof options === 'object', 'options is an invalid object');
+
+        /* data-* options should be strictly an object */
+        assert(typeof dataOptions === 'object', 'data-' + settings.dataOptionsKey + ': ' + dataOptions + ' is invalid JSON');
+
+        options = $.extend(true, {}, settings.options, options, dataOptions);
+
+        /* Call the $.fn.magnificPopup function */
+        $ele.magnificPopup(options);
+
+        /* Stop propagation on child elements */
+        var $child = $ele.find(settings.stopPropagationSelector);
+        $child.on(nsp('click'), function (event) {
             event.preventDefault();
             event.stopPropagation();
-            _closePopup();
-        });
-
-        $w.on(events.iframeResize, function (e, data) {
-            setIframeHeight(data.height);
-        });
-    }
-
-    /* Register useful objects, functions on the global namespace */
-    function registerGlobalObject() {
-        window.mfpWrapper = $.extend(true, {}, settings, {
-            events: events,
-            getPopupInstance: _getPopupInstance,
-            nsp: nsp
         });
     }
 
     /* Get the namespaced event name */
     function nsp(eventname) {
-        var namespace = settings.event.namespace;
-        /* Ensure the namespace always starts with a preceding period (.), trigger only once */
+        var namespace = settings.eventNamespace;
+        /* Ensure the event namespace always starts with a preceding period (.), trigger only once */
         if (namespace[0] !== '.') {
-            settings.event.namespace = namespace = '.' + namespace;
+            settings.eventNamespace = namespace = '.' + namespace;
         }
         return eventname + namespace;
     }
 
-    /* Simple wrapper to throw an error when certain criteria isn't met. */
+    /* Simple wrapper to throw a TypeError when certain criteria isn't met. */
     function assert(expression, message) {
         if (!expression) {
-            throw new Error(message);
+            throw new TypeError(message);
         }
-    }
-
-    /* Adjust iframe height to the height of the iframe's html */
-    function setIframeHeight(height) {
-        height = height || $(_getIframeDocument()).find('html').height();
-
-        _getIframe().height(height)
-            .parent().css({'padding-top': 0, 'height': height});
-    }
-
-    /* Clear the iframe height set by this.setIframeHeight() */
-    function clearIframeHeight() {
-        _getIframe().height('')
-            .parent().css({'padding-top': '', 'height': ''});
-    }
-
-    /* Magnific Popup instance */
-    function _getPopupInstance() {
-        return $.magnificPopup.instance;
-    }
-
-    /* Close the popup */
-    function _closePopup() {
-        return _getPopupInstance().close();
-    }
-
-    /* Magnific popup instance settings */
-    function _getPopupInstanceSt() {
-        return _getPopupInstance().st;
-    }
-
-    /* The iframe jQuery element */
-    function _getIframe() {
-        return $('iframe.mfp-iframe');
-    }
-
-    /* The iframe jQuery element */
-    function _getIframeDOM() {
-        return _getIframe()[0];
-    }
-
-    /* The iframe's document object */
-    function _getIframeDocument() {
-        return _getIframeDOM().contentDocument;
     }
 
 })(jQuery);
