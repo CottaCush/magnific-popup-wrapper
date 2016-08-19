@@ -1,0 +1,32 @@
+{
+  "name": "magnific-popup-wrapper",
+  "version": "0.0.0",
+  "description": "A wrapper script for Dmitry Semenov's Magnific-Popup (https://github.com/dimsemenov/Magnific-Popup)",
+  "main": "dist/jquery.magnific-popup-wrapper.js",
+  "scripts": {
+    "test": "./node_modules/.bin/gulp jshint:quiet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CottaCush/magnific-popup-wrapper.git"
+  },
+  "keywords": [
+    "magnific-popup",
+    "wrapper",
+    "javascript",
+    "jquery"
+  ],
+  "author": "Cotta & Cush Limited <developers@cottacush.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CottaCush/magnific-popup-wrapper/issues"
+  },
+  "homepage": "https://github.com/CottaCush/magnific-popup-wrapper#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-header": "^1.8.8",
+    "gulp-jshint": "^2.0.1",
+    "gulp-minify": "0.0.14",
+    "jshint": "^2.9.3"
+  }
+}
