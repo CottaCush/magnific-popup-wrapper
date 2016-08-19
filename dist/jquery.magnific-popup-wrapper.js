@@ -2,7 +2,7 @@
  * Magnific Popup Wrapper
  * A wrapper script for Dmitry Semenov's Magnific-Popup (https://github.com/dimsemenov/Magnific-Popup)
  * https://github.com/CottaCush/magnific-popup-wrapper#readme
- * @version v0.0.0
+ * @version v0.0.1
  * @license MIT
  * Copyright (c) 2016 Cotta & Cush Limited <developers@cottacush.com>
  */

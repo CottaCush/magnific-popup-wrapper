@@ -1,6 +1,6 @@
 {
   "name": "magnific-popup-wrapper",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A wrapper script for Dmitry Semenov's Magnific-Popup (https://github.com/dimsemenov/Magnific-Popup)",
   "main": "dist/jquery.magnific-popup-wrapper.js",
   "scripts": {
